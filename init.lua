@@ -156,11 +156,6 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
--- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
--- instead raise a dialog asking if you wish to save the current file(s)
--- See `:help 'confirm'`
-vim.opt.confirm = true
-
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -773,7 +768,6 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         clangd = {},
-        gopls = {},
         jsonls = {},
         marksman = {},
         bashls = {},
@@ -786,7 +780,7 @@ require('lazy').setup({
           filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'css', 'scss', 'less', 'svelte', 'vue', 'vue-html' },
         },
         html = {},
-        volar = {},
+        tailwindcss = {},
 
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -883,14 +877,28 @@ require('lazy').setup({
         }
       end,
 
+      -- formatters_by_ft = {
+      --   lua = { 'stylua' },
+      --   -- Conform can also run multiple formatters sequentially
+      --   -- python = { 'isort', 'black' },
+      --   --
+      --   -- You can use 'stop_after_first' to run the first available formatter from the list
+      --   javascript = { 'prettierd', 'prettier', stop_after_first = true },
+      --   svelte = { 'prettierd', 'prettier', stop_after_first = true },
+      --   html = { 'prettierd', 'prettier', stop_after_first = true },
+      -- },
+      --
+      --
       formatters_by_ft = {
         lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { 'isort', 'black' },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+
+        javascript = {
+          formatters = { 'prettierd', 'prettier' },
+          stop_after_first = true,
+        },
       },
+
+      -- Add more filetypes here if needed
     },
   },
 
@@ -1014,16 +1022,10 @@ require('lazy').setup({
   -- Using lazy.nvim
   -- Colorscheme
 
-  {
-    'space-chalk/spacechalk.nvim',
-    lazy = false, -- loaded during startup since it's the main colorscheme
-    priority = 1000, -- load this before all other start plugins
-    config = function()
-      -- set the colorscheme here
-      vim.cmd.colorscheme 'spacechalk'
-      vim.g.colors_name = 'spacechalk'
-    end,
-  },
+  { 'EdenEast/nightfox.nvim' }, -- lazy
+
+  -- Using lazy.nvim example:
+  { 'andymass/vim-matchup' },
   --
 
   -- Highlight todo, notes, etc in comments
@@ -1072,8 +1074,11 @@ require('lazy').setup({
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+    dependencies = {
+      'andymass/vim-matchup',
+    },
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'vue' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'vue', 'svelte' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1084,6 +1089,10 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      matchup = {
+        enable = true, -- enable vim-matchup integration
+        include_match_words = true,
+      },
     },
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -1161,7 +1170,34 @@ end, { desc = 'ToggleTerm' })
 vim.keymap.set('n', '-', '<cmd>Oil<CR>', { desc = 'Open Oil File Explorer' })
 vim.keymap.set('n', ',ne', '<cmd>NvimTreeToggle<CR>', { desc = 'Open File Tree' })
 
+vim.cmd 'colorscheme carbonfox'
 -- End Keymaps
+-- Help gf command
+vim.opt.path:append 'src'
+vim.opt.suffixesadd:prepend '.svelte'
 
+-- Custom gf behavior for Svelte aliases like $lib
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'svelte',
+  callback = function()
+    vim.opt_local.includeexpr = [[substitute(v:fname,'^$lib','src/lib','')]]
+    vim.opt_local.suffixesadd:prepend '.svelte'
+    vim.opt_local.path:append 'src'
+  end,
+})
+-- end
+-- Vim Matchup misc
+vim.g.matchup_matchparen_offscreen = { method = 'popup' }
+
+-- Optionally, make sure it's enabled in Svelte buffers
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'svelte',
+  callback = function()
+    vim.b.matchup_matchparen_enabled = 1
+  end,
+})
+
+--End
+--
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
