@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -264,6 +264,153 @@ require('lazy').setup({
       },
     },
   },
+  -- plugins by Sabeel
+
+  {
+    'romgrk/barbar.nvim',
+    dependencies = {
+      'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
+      'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
+    },
+    init = function()
+      vim.g.barbar_auto_setup = true
+    end,
+    opts = {
+      animation = true,
+      insert_at_start = true,
+      -- any other options...
+    },
+    config = function(_, opts)
+      require('barbar').setup(opts)
+
+      -- Your custom keymaps here
+      local map = vim.api.nvim_set_keymap
+      local opts = { noremap = true, silent = true }
+
+      -- Magic buffer-picking mode on <leader>a
+      map('n', '<leader>a', '<Cmd>BufferPick<CR>', opts)
+
+      -- (Optional) Pick and delete buffer
+      -- map('n', '<leader>x', '<Cmd>BufferPickDelete<CR>', opts)
+
+      -- Add more of your custom mappings if needed
+    end,
+    version = '^1.0.0',
+  },
+
+  --{ 'echasnovski/mini.icons', version = false },
+  { 'echasnovski/mini.nvim', version = false },
+
+  --Zen Mode
+  {
+    'folke/zen-mode.nvim',
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    },
+  },
+
+  {
+    'windwp/nvim-ts-autotag',
+    event = 'InsertEnter',
+    ft = { 'html', 'xml', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue' },
+    config = function()
+      require('nvim-ts-autotag').setup()
+    end,
+  },
+
+  -- {
+  --   'stevearc/oil.nvim',
+  --   ---@module 'oil'
+  --   ---@type oil.SetupOpts
+  --   opts = {},
+  --   -- Optional dependencies
+  --   dependencies = { 'echasnovski/mini.icons', opts = {} },
+  --   -- dependencies = { 'nvim-tree/nvim-web-devicons' }, -- use if you prefer nvim-web-devicons
+  --   -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
+  --   lazy = false,
+  --   config = function()
+  --     require('oil').setup {
+  --
+  --       float = {
+  --
+  --         -- Padding around the floating window
+  --         padding = 2,
+  --         -- max_width and max_height can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
+  --         max_width = 0.6,
+  --         max_height = 0.6,
+  --         border = nil,
+  --         win_options = {
+  --           winblend = 0,
+  --         },
+  --         -- optionally override the oil buffers window title with custom function: fun(winid: integer): string
+  --         get_win_title = nil,
+  --         -- preview_split: Split direction: "auto", "left", "right", "above", "below".
+  --         preview_split = 'auto',
+  --         -- This is the config that will be passed to nvim_open_win.
+  --         -- Change values here to customize the layout
+  --         override = function(conf)
+  --           return conf
+  --         end,
+  --       },
+  --     }
+  --   end,
+  -- },
+
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = '*',
+    lazy = false,
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      require('nvim-tree').setup {}
+    end,
+  },
+
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    opts = {--[[ things you want to change go here]]
+    },
+  },
+
+  { 'milanglacier/yarepl.nvim', config = true },
+
+  {
+    'hat0uma/csvview.nvim',
+    ---@module "csvview"
+    ---@type CsvView.Options
+    opts = {
+      parser = { comments = { '#', '//' } },
+      keymaps = {
+        -- Text objects for selecting fields
+        textobject_field_inner = { 'if', mode = { 'o', 'x' } },
+        textobject_field_outer = { 'af', mode = { 'o', 'x' } },
+        -- Excel-like navigation:
+        -- Use <Tab> and <S-Tab> to move horizontally between fields.
+        -- Use <Enter> and <S-Enter> to move vertically between rows and place the cursor at the end of the field.
+        -- Note: In terminals, you may need to enable CSI-u mode to use <S-Tab> and <S-Enter>.
+        jump_next_field_end = { '<Tab>', mode = { 'n', 'v' } },
+        jump_prev_field_end = { '<S-Tab>', mode = { 'n', 'v' } },
+        jump_next_row = { '<Enter>', mode = { 'n', 'v' } },
+        jump_prev_row = { '<S-Enter>', mode = { 'n', 'v' } },
+      },
+    },
+    cmd = { 'CsvViewEnable', 'CsvViewDisable', 'CsvViewToggle' },
+  },
+
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+  },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
@@ -331,6 +478,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
+        { ',n', group = 'Utils' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       },
     },
@@ -503,7 +651,6 @@ require('lazy').setup({
       --
       -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
       -- and elegantly composed help section, `:help lsp-vs-treesitter`
-
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
       --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
@@ -658,9 +805,21 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
+        clangd = {},
+        jsonls = {},
+        marksman = {},
+        bashls = {},
+        ast_grep = {},
+        texlab = {},
+        gdtoolkit = {},
+        standardjs = {},
+        pyright = {},
+        emmet_language_server = {
+          filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'css', 'scss', 'less', 'svelte', 'vue', 'vue-html' },
+        },
+        html = {},
+        tailwindcss = {},
+
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -668,7 +827,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
+        ts_ls = {},
         --
 
         lua_ls = {
@@ -755,14 +914,30 @@ require('lazy').setup({
           lsp_format = lsp_format_opt,
         }
       end,
+
+      -- formatters_by_ft = {
+      --   lua = { 'stylua' },
+      --   -- Conform can also run multiple formatters sequentially
+      --   -- python = { 'isort', 'black' },
+      --   --
+      --   -- You can use 'stop_after_first' to run the first available formatter from the list
+      --   javascript = { 'prettierd', 'prettier', stop_after_first = true },
+      --   svelte = { 'prettierd', 'prettier', stop_after_first = true },
+      --   html = { 'prettierd', 'prettier', stop_after_first = true },
+      -- },
+      --
+      --
       formatters_by_ft = {
         lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+
+        javascript = {
+          formatters = { 'prettierd', 'prettier' },
+          stop_after_first = true,
+        },
+        html = { 'prettierd', 'prettier', stop_after_first = true },
       },
+
+      -- Add more filetypes here if needed
     },
   },
 
@@ -784,14 +959,14 @@ require('lazy').setup({
         end)(),
         dependencies = {
           -- `friendly-snippets` contains a variety of premade snippets.
-          --    See the README about individual language/framework/plugin snippets:
-          --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          -- See the README about individual language/framework/plugin snippets:
+          -- https://github.com/rafamadriz/friendly-snippets
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -834,7 +1009,7 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<CR>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
@@ -883,28 +1058,25 @@ require('lazy').setup({
       }
     end,
   },
+  -- Using lazy.nvim
+  -- Colorscheme
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
+  -- { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true, opts = ... },
+
+  {
+    'jaredgorski/spacecamp',
+    lazy = false,
+    priority = 1000,
     config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
-      }
-
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- Optionally configure and load the colorscheme
+      -- directly inside the plugin declaration.
+      vim.cmd.colorscheme 'spacecamp'
     end,
   },
+
+  -- Using lazy.nvim example:
+  { 'andymass/vim-matchup' },
+  --
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
@@ -926,6 +1098,7 @@ require('lazy').setup({
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
+      require('mini.comment').setup()
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -951,8 +1124,11 @@ require('lazy').setup({
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+    dependencies = {
+      'andymass/vim-matchup',
+    },
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'vue', 'svelte' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -963,6 +1139,10 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      matchup = {
+        enable = true, -- enable vim-matchup integration
+        include_match_words = true,
+      },
     },
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -981,18 +1161,18 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
@@ -1020,5 +1200,72 @@ require('lazy').setup({
   },
 })
 
+-- Things that I have to initialize
+vim.keymap.set('t', '<esc><esc>', '<c-\\><c-n>')
+
+-- colorscheme set
+-- vim.o.background = 'dark' -- or "light" for light mode
+-- vim.cmd [[colorscheme gruvbox]]
+
+-- TOGGLE TERM STUFF
+local is_windows = vim.loop.os_uname().sysname == 'Windows_NT'
+--
+require('toggleterm').setup {
+  shell = is_windows and 'powershell.exe -NoLogo -NoExit' or vim.o.shell,
+  direction = 'horizontal',
+  size = 16,
+}
+vim.keymap.set('n', ',nt', function()
+  require('toggleterm').toggle(1) -- default terminal
+end, { desc = 'ToggleTerm' })
+
+-- END TOGGLE TERM STUFF
+-- Trying some keymaps
+vim.keymap.set('n', '-', '<cmd>Oil<CR>', { desc = 'Open Oil File Explorer' })
+vim.keymap.set('n', ',ne', '<cmd>NvimTreeToggle<CR>', { desc = 'Open File Tree' })
+
+-- End Keymaps
+-- Help gf command
+vim.opt.path:append 'src'
+vim.opt.suffixesadd:prepend '.svelte'
+
+-- Custom gf behavior for Svelte aliases like $lib
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'svelte',
+  callback = function()
+    vim.opt_local.includeexpr = [[substitute(v:fname,'^$lib','src/lib','')]]
+    vim.opt_local.suffixesadd:prepend '.svelte'
+    vim.opt_local.path:append 'src'
+  end,
+})
+-- end
+-- Vim Matchup misc
+vim.g.matchup_matchparen_offscreen = { method = 'popup' }
+
+-- Optionally, make sure it's enabled in Svelte buffers
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'svelte',
+  callback = function()
+    vim.b.matchup_matchparen_enabled = 1
+  end,
+})
+
+vim.keymap.set('i', '<C-h>', '<C-w>', { noremap = true })
+--End
+-- Automatically close oil nvim empty buffers on tabnew
+
+-- End
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+--
+-- Set tab width 2 for html files
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'html', 'svelte' },
+  callback = function()
+    vim.opt.tabstop = 2
+    vim.opt.shiftwidth = 2
+    vim.opt.expandtab = true
+    vim.opt.softtabstop = 2
+  end,
+})
