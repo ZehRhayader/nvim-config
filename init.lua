@@ -541,11 +541,20 @@ require('lazy').setup({
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          mappings = {
+            n = {
+              -- Map 'dd' in normal mode to delete the buffer under the cursor
+              ['dd'] = require('telescope.actions').delete_buffer,
+              -- Map '<C-d>' in normal mode to delete multiple selected buffers
+              ['<C-d>'] = require('telescope.actions').delete_buffer,
+            },
+            i = {
+              -- Map '<C-d>' in insert mode to delete multiple selected buffers
+              ['<C-d>'] = require('telescope.actions').delete_buffer,
+            },
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -827,7 +836,6 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        ts_ls = {},
         --
 
         lua_ls = {
@@ -1061,18 +1069,7 @@ require('lazy').setup({
   -- Using lazy.nvim
   -- Colorscheme
 
-  -- { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true, opts = ... },
-
-  {
-    'jaredgorski/spacecamp',
-    lazy = false,
-    priority = 1000,
-    config = function()
-      -- Optionally configure and load the colorscheme
-      -- directly inside the plugin declaration.
-      vim.cmd.colorscheme 'spacecamp'
-    end,
-  },
+  { 'bluz71/vim-moonfly-colors', name = 'moonfly', lazy = false, priority = 1000 },
 
   -- Using lazy.nvim example:
   { 'andymass/vim-matchup' },
@@ -1152,6 +1149,13 @@ require('lazy').setup({
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
 
+  -- Sabeel updated TS plugin
+  {
+    'pmizio/typescript-tools.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+    opts = {},
+  },
+
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -1221,7 +1225,7 @@ end, { desc = 'ToggleTerm' })
 
 -- END TOGGLE TERM STUFF
 -- Trying some keymaps
-vim.keymap.set('n', '-', '<cmd>Oil<CR>', { desc = 'Open Oil File Explorer' })
+-- vim.keymap.set('n', '-', '<cmd>Oil<CR>', { desc = 'Open Oil File Explorer' })
 vim.keymap.set('n', ',ne', '<cmd>NvimTreeToggle<CR>', { desc = 'Open File Tree' })
 
 -- End Keymaps
@@ -1261,7 +1265,7 @@ vim.keymap.set('i', '<C-h>', '<C-w>', { noremap = true })
 -- Set tab width 2 for html files
 
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = { 'html', 'svelte' },
+  pattern = { 'html', 'svelte', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
   callback = function()
     vim.opt.tabstop = 2
     vim.opt.shiftwidth = 2
@@ -1269,3 +1273,6 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.opt.softtabstop = 2
   end,
 })
+
+-- Lua initialization file
+vim.cmd [[colorscheme moonfly]]
