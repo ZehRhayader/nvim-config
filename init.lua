@@ -313,13 +313,24 @@ require('lazy').setup({
   },
 
   {
-    'windwp/nvim-ts-autotag',
-    event = 'InsertEnter',
-    ft = { 'html', 'xml', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue' },
-    config = function()
-      require('nvim-ts-autotag').setup()
-    end,
+    'tronikelis/ts-autotag.nvim',
+    ft = { 'html', 'svelte', 'vue', 'javascript', 'typescript', 'jsx', 'tsx' },
+    opts = {
+      filetypes = { 'html', 'svelte', 'vue', 'javascript', 'typescript', 'jsx', 'tsx' },
+      auto_close = { enabled = true },
+      auto_rename = { enabled = true },
+      disable_in_macro = true,
+    },
   },
+
+  -- {
+  --   'windwp/nvim-ts-autotag',
+  --   event = 'InsertEnter',
+  --   ft = { 'html', 'xml', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'svelte' },
+  --   config = function()
+  --     require('nvim-ts-autotag').setup()
+  --   end,
+  -- },
 
   -- {
   --   'stevearc/oil.nvim',
@@ -1268,6 +1279,12 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 vim.keymap.set('i', '<C-h>', '<C-w>', { noremap = true })
+vim.api.nvim_set_keymap(
+  'n', -- normal mode
+  '<leader>ct', -- keybinding
+  ':TsTagRename<CR>', -- command to run
+  { noremap = true, silent = true, desc = 'Change [T]ag Name' }
+)
 --End
 -- Automatically close oil nvim empty buffers on tabnew
 
