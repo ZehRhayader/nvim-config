@@ -87,6 +87,8 @@ P.S. You can delete this when you're done too. It's your config now! :)
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -260,36 +262,6 @@ require('lazy').setup({
   },
   -- plugins by Sabeel
 
-  {
-    'romgrk/barbar.nvim',
-    dependencies = {
-      'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
-      'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
-    },
-    init = function() vim.g.barbar_auto_setup = true end,
-    opts = {
-      animation = true,
-      insert_at_start = true,
-      -- any other options...
-    },
-    config = function(_, opts)
-      require('barbar').setup(opts)
-
-      -- Your custom keymaps here
-      local map = vim.api.nvim_set_keymap
-      local opts = { noremap = true, silent = true }
-
-      -- Magic buffer-picking mode on <leader>a
-      map('n', '<leader>a', '<Cmd>BufferPick<CR>', opts)
-
-      -- (Optional) Pick and delete buffer
-      -- map('n', '<leader>x', '<Cmd>BufferPickDelete<CR>', opts)
-
-      -- Add more of your custom mappings if needed
-    end,
-    version = '^1.0.0',
-  },
-
   --{ 'echasnovski/mini.icons', version = false },
   { 'echasnovski/mini.nvim', version = false },
 
@@ -367,10 +339,57 @@ require('lazy').setup({
     dependencies = {
       'nvim-lua/plenary.nvim',
       'MunifTanjim/nui.nvim',
-      'nvim-tree/nvim-web-devicons', -- optional, but recommended
+      'nvim-tree/nvim-web-devicons',
     },
-    lazy = false, -- neo-tree will lazily load itself
   },
+
+  {
+    'antosha417/nvim-lsp-file-operations',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-neo-tree/neo-tree.nvim', -- makes sure that this loads after Neo-tree.
+    },
+    config = function() require('lsp-file-operations').setup() end,
+  },
+  {
+    's1n7ax/nvim-window-picker',
+    version = '2.*',
+    config = function()
+      require('window-picker').setup {
+        hint = 'floating-big-letter',
+        filter_rules = {
+          include_current_win = false,
+          autoselect_one = true,
+          -- filter using buffer options
+          bo = {
+            -- if the file type is one of following, the window will be ignored
+            filetype = { 'neo-tree', 'neo-tree-popup', 'notify' },
+            -- if the buffer type is one of following, the window will be ignored
+            buftype = { 'terminal', 'quickfix' },
+          },
+        },
+      }
+    end,
+  },
+
+  -- {
+  --   'nvim-neo-tree/neo-tree.nvim',
+  --   branch = 'v3.x',
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --     'MunifTanjim/nui.nvim',
+  --     'nvim-tree/nvim-web-devicons',
+  --   },
+  --   lazy = false,
+  --
+  --   config = function()
+  --     require('neo-tree').setup {
+  --       filesystem = {
+  --         follow_current_file = { enabled = true },
+  --       },
+  --     }
+  --   end,
+  -- },
 
   {
     'akinsho/toggleterm.nvim',
@@ -402,6 +421,13 @@ require('lazy').setup({
       },
     },
     cmd = { 'CsvViewEnable', 'CsvViewDisable', 'CsvViewToggle' },
+  },
+
+  {
+    'JoosepAlviste/nvim-ts-context-commentstring',
+  },
+  {
+    'tpope/vim-commentary',
   },
 
   {
@@ -1050,15 +1076,18 @@ require('lazy').setup({
   },
   -- Using lazy.nvim
   -- Colorscheme
-
+  --
   {
-    'navarasu/onedark.nvim',
+    'projekt0n/github-nvim-theme',
+    name = 'github-theme',
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
-      require('onedark').setup {
-        style = 'darker',
+      require('github-theme').setup {
+        -- ...
       }
-      require('onedark').load()
+
+      vim.cmd 'colorscheme github_dark_default'
     end,
   },
 
@@ -1086,7 +1115,12 @@ require('lazy').setup({
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
-      require('mini.comment').setup()
+      -- require('mini.comment').setup {
+      --   options = {
+      --     custom_commentstring = function() return require('ts_context_commentstring').calculate_commentstring() or vim.bo.commentstring end,
+      --   },
+      -- }
+      -- require('mini.files').setup()
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -1105,37 +1139,56 @@ require('lazy').setup({
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
+
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    branch = 'main',
+    lazy = false,
     build = ':TSUpdate',
-    -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-    dependencies = {
-      'andymass/vim-matchup',
-    },
-    opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'vue', 'svelte' },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-      matchup = {
-        enable = true, -- enable vim-matchup integration
-        include_match_words = true,
-      },
-    },
-    -- There are additional nvim-treesitter modules that you can use to interact
-    -- with nvim-treesitter. You should go explore a few and see what interests you:
-    --
-    --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-    --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-    --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+    branch = 'main',
+    -- [[ Configure Treesitter ]] See `:help nvim-treesitter-intro`
+    config = function()
+      local parsers = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'vue',
+        'svelte',
+        'ruby',
+        'embedded_template',
+        'json',
+      }
+      require('nvim-treesitter').install(parsers)
+      vim.api.nvim_create_autocmd('FileType', {
+        callback = function(args)
+          local buf, filetype = args.buf, args.match
+
+          local language = vim.treesitter.language.get_lang(filetype)
+          if not language then return end
+
+          -- check if parser exists and load it
+          if not vim.treesitter.language.add(language) then return end
+          -- enables syntax highlighting and other treesitter features
+          vim.treesitter.start(buf, language)
+
+          -- enables treesitter based folds
+          -- for more info on folds see `:help folds`
+          -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+          -- vim.wo.foldmethod = 'expr'
+
+          -- enables treesitter based indentation
+
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+    end,
   },
 
   -- Sabeel updated TS plugin
@@ -1215,7 +1268,8 @@ end, { desc = 'ToggleTerm' })
 -- END TOGGLE TERM STUFF
 -- Trying some keymaps
 -- vim.keymap.set('n', '-', '<cmd>Oil<CR>', { desc = 'Open Oil File Explorer' })
-vim.keymap.set('n', ',ne', '<cmd>Neotree<CR>', { desc = 'Open File Tree' })
+vim.keymap.set('n', '\\', '<cmd>:Neotree toggle<cr>', { desc = 'Open File Tree' })
+vim.keymap.set('n', '|', '<cmd>:Neotree toggle show buffers<cr>', { desc = 'Open File Tree' })
 
 -- End Keymaps
 -- Help gf command
@@ -1267,4 +1321,17 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- Lua initialization file
+-- Remove annoying comment continuation thing
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = '*',
+  callback = function() vim.opt_local.formatoptions:remove { 'r', 'o' } end,
+})
+
+-- neo tree follow current file
+require('neo-tree').setup {
+  filesystem = {
+    follow_current_file = {
+      enabled = true,
+    },
+  },
+}
