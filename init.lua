@@ -87,6 +87,7 @@ P.S. You can delete this when you're done too. It's your config now! :)
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -636,7 +637,7 @@ require('lazy').setup({
         standardjs = {},
         pyright = {},
         emmet_language_server = {
-          filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'css', 'scss', 'less', 'svelte', 'vue', 'vue-html', 'eruby' },
+          filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'css', 'scss', 'less', 'svelte', 'eruby' },
         },
         html = {},
         tailwindcss = {},
