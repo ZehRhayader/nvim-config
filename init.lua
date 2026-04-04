@@ -659,7 +659,7 @@ require('lazy').setup({
                 path = { 'lua/?.lua', 'lua/?/init.lua' },
               },
               diagnostics = {
-                globals = { 'love' },
+                globals = {},
               },
 
               workspace = {
@@ -669,6 +669,7 @@ require('lazy').setup({
                 library = vim.tbl_extend('force', vim.api.nvim_get_runtime_file('', true), {
                   '${3rd}/luv/library',
                   '${3rd}/busted/library',
+                  '${3rd}/love2d/library',
                 }),
               },
             })
@@ -796,7 +797,7 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        preset = 'enter',
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -932,6 +933,12 @@ require('lazy').setup({
       'MunifTanjim/nui.nvim',
       'nvim-tree/nvim-web-devicons',
     },
+  },
+
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    config = true,
   },
 
   { -- Highlight, edit, and navigate code
